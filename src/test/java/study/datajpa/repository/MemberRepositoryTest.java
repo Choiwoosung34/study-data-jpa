@@ -10,7 +10,9 @@ import study.datajpa.entity.Team;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
+import static org.apache.coyote.http11.Constants.a;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -142,5 +144,19 @@ class MemberRepositoryTest {
         for (Member member : result) {
             System.out.println("member = " + member);
         }
+    }
+
+    @Test
+    void returnType() throws Exception {
+        Member member1 = new Member("member1", 10);
+        Member member2 = new Member("member2", 20);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        List<Member> result1 = memberRepository.findListByUsername("member1");
+        Member result2 = memberRepository.findMemberByUsername("member1");
+        Optional<Member> result3 = memberRepository.findOptionalByUsername("member1");
+        assertEquals(result1.get(0), result2);
+        assertEquals(result2, result3.get());
     }
 }
