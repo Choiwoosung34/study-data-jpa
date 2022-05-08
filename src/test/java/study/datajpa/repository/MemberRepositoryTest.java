@@ -3,6 +3,9 @@ package study.datajpa.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
@@ -158,5 +161,31 @@ class MemberRepositoryTest {
         Optional<Member> result3 = memberRepository.findOptionalByUsername("member1");
         assertEquals(result1.get(0), result2);
         assertEquals(result2, result3.get());
+    }
+
+    @Test
+    void paging() throws Exception {
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 10));
+        memberRepository.save(new Member("member3", 10));
+        memberRepository.save(new Member("member4", 10));
+        memberRepository.save(new Member("member5", 10));
+
+        int age = 10;
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+        Page<Member> page = memberRepository.findByAge(age, pageRequest);
+
+        Page<MemberDto> map = page.map(m -> new MemberDto(m.getId(), m.getUsername(), null));
+
+        List<Member> content = page.getContent();
+        long totalElements = page.getTotalElements();
+
+        assertEquals(3, content.size());
+        assertEquals(5, totalElements);
+        assertEquals(0, page.getNumber());
+        assertEquals(2, page.getTotalPages());
+        assertTrue(page.isFirst());
+        assertTrue(page.hasNext());
     }
 }
