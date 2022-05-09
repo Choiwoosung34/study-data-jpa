@@ -303,4 +303,24 @@ class MemberRepositoryTest {
 
         assertEquals("m1", result.get(0).getUsername());
     }
+
+    @Test
+    void projections() throws Exception {
+        Team teamA = new Team("teamA");
+        em.persist(teamA);
+
+        Member m1 = new Member("m1", 0, teamA);
+        Member m2 = new Member("m2", 0, teamA);
+        em.persist(m1);
+        em.persist(m2);
+
+        em.flush();
+        em.clear();
+
+//        List<UserNameOnly> result = memberRepository.findProjectionsByUsername("m1");
+        var result = memberRepository.findProjectionsByUsername("m1", NestedClosedProjections.class);
+        for (var userNameOnly : result) {
+            System.out.println("usernameOnly = " + userNameOnly.getUsername());
+        }
+    }
 }
